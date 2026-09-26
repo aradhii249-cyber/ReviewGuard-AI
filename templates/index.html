@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>ReviewGuard AI - Fake Review Detector</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<!-- ================= NAVBAR ================= -->
+
+<header class="navbar">
+
+    <div class="logo">
+        🛡️ ReviewGuard <span>AI</span>
+    </div>
+
+    <nav>
+
+        <a href="#home">Home</a>
+
+        <a href="#how">How It Works</a>
+
+        <a href="#about">About</a>
+
+    </nav>
+
+</header>
+
+
+
+<!-- ================= HERO ================= -->
+
+<section class="hero" id="home">
+
+
+    <div class="hero-text">
+
+        <div class="badge">
+            ✨ NLP + MACHINE LEARNING
+        </div>
+
+
+        <h1>
+            Discover Reviews
+            <span>Before You Trust Them.</span>
+        </h1>
+
+
+        <p>
+            Analyze review text using Natural Language Processing
+            and machine learning to identify potentially deceptive
+            reviews.
+        </p>
+
+
+        <div class="hero-points">
+
+            <span>🧠 NLP Analysis</span>
+
+            <span>🤖 Machine Learning</span>
+
+            <span>⚡ Instant Results</span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- ================= ANALYZER ================= -->
+
+    <div class="analyzer-card">
+
+
+        <div class="card-top">
+
+            <div>
+
+                <h2>
+                    🔍 Review Analyzer
+                </h2>
+
+                <p>
+                    Paste a review below
+                </p>
+
+            </div>
+
+
+            <div class="ai-status">
+
+                ● AI READY
+
+            </div>
+
+        </div>
+
+
+
+        <form
+            action="/predict"
+            method="POST"
+            id="reviewForm">
+
+
+            <label for="review">
+                Review Text
+            </label>
+
+
+            <textarea
+                id="review"
+                name="review"
+                placeholder="Paste an online review here..."
+                required>{{ review if review else "" }}</textarea>
+
+
+            <div class="input-info">
+
+                <span id="wordCount">
+                    0 words
+                </span>
+
+                <span id="charCount">
+                    0 characters
+                </span>
+
+            </div>
+
+
+            <div class="example-buttons">
+
+                <button
+                    type="button"
+                    class="example-btn"
+                    onclick="useExample('genuine')">
+
+                    ✅ Genuine Example
+
+                </button>
+
+
+                <button
+                    type="button"
+                    class="example-btn"
+                    onclick="useExample('suspicious')">
+
+                    ⚠️ Suspicious Example
+
+                </button>
+
+            </div>
+
+
+            <button
+                type="submit">
+
+                🔎 Analyze Review
+
+            </button>
+
+
+            <button
+                type="button"
+                class="clear-btn"
+                onclick="clearReview()">
+
+                🗑️ Clear
+
+            </button>
+
+
+        </form>
+
+
+
+        <!-- ================= RESULT ================= -->
+
+        {% if analysis %}
+
+        <div class="result-box {{ analysis.result_type }}">
+
+
+            <div class="result-symbol">
+
+                {% if analysis.result_type == "suspicious" %}
+
+                    ⚠️
+
+                {% else %}
+
+                    ✅
+
+                {% endif %}
+
+            </div>
+
+
+            <div class="result-content">
+
+                <small>
+                    AI ANALYSIS RESULT
+                </small>
+
+
+                <h2>
+                    {{ analysis.result }}
+                </h2>
+
+
+                {% if analysis.result_type == "suspicious" %}
+
+                <p>
+                    The model detected patterns that may be
+                    associated with deceptive reviews.
+                </p>
+
+                {% else %}
+
+                <p>
+                    The model did not classify this review as
+                    deceptive.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= STATS ================= -->
+
+        <div class="stats">
+
+
+            <div>
+
+                <strong>
+                    {{ analysis.word_count }}
+                </strong>
+
+                <span>
+                    Words
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    {{ analysis.character_count }}
+                </strong>
+
+                <span>
+                    Characters
+                </span>
+
+            </div>
+
+
+            <div>
+
+                <strong>
+                    {{ analysis.sentence_count }}
+                </strong>
+
+                <span>
+                    Sentences
+                </span>
+
+            </div>
+
+
+        </div>
+
+
+        <div class="notice">
+
+            ⚠️ This result is a machine-learning prediction.
+            It should be treated as an indication, not absolute
+            proof that a review is fake or genuine.
+
+        </div>
+
+        {% endif %}
+
+
+
+        <!-- ================= ERROR ================= -->
+
+        {% if error %}
+
+        <div class="error-box">
+
+            ⚠️ {{ error }}
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= HOW IT WORKS ================= -->
+
+<section class="how" id="how">
+
+
+    <h2>
+        How ReviewGuard Works
+    </h2>
+
+
+    <p class="subtitle">
+        Three simple steps to analyze a review.
+    </p>
+
+
+    <div class="steps">
+
+
+        <div class="step">
+
+            <div class="step-icon">
+                📝
+            </div>
+
+            <h3>
+                01. Enter Review
+            </h3>
+
+            <p>
+                Paste an online review into the analyzer.
+            </p>
+
+        </div>
+
+
+
+        <div class="step">
+
+            <div class="step-icon">
+                🧠
+            </div>
+
+            <h3>
+                02. NLP Processing
+            </h3>
+
+            <p>
+                The review is processed using Natural Language
+                Processing techniques.
+            </p>
+
+        </div>
+
+
+
+        <div class="step">
+
+            <div class="step-icon">
+                🤖
+            </div>
+
+            <h3>
+                03. Prediction
+            </h3>
+
+            <p>
+                The trained machine-learning model classifies
+                the review.
+            </p>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= OCR ================= -->
+
+<section class="how">
+
+
+    <h2>
+        📷 Screenshot Review Analysis
+    </h2>
+
+
+    <p class="subtitle">
+
+        Upload a screenshot containing a review.
+
+    </p>
+
+
+    <div class="analyzer-card"
+         style="margin:40px auto 0; text-align:left;">
+
+
+        <form
+            action="/ocr"
+            method="POST"
+            enctype="multipart/form-data">
+
+
+            <label for="screenshot">
+
+                📷 Upload Review Screenshot
+
+            </label>
+
+
+            <input
+                type="file"
+                id="screenshot"
+                name="screenshot"
+                accept=".png,.jpg,.jpeg"
+                required>
+
+
+            <p class="info">
+
+                Supported formats: PNG, JPG, JPEG
+
+            </p>
+
+
+            <button
+                type="submit">
+
+                📷 Extract & Analyze
+
+            </button>
+
+
+        </form>
+
+
+        {% if ocr_message %}
+
+        <div class="result-box truthful">
+
+            <div class="result-symbol">
+                ✅
+            </div>
+
+            <div class="result-content">
+
+                <small>
+                    OCR RESULT
+                </small>
+
+                <h2>
+                    {{ ocr_message }}
+                </h2>
+
+                <p>
+                    File received: {{ filename }}
+                </p>
+
+            </div>
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= ABOUT ================= -->
+
+<section class="about" id="about">
+
+
+    <div class="about-text">
+
+        <h2>
+            Built with NLP & Machine Learning
+        </h2>
+
+        <p>
+
+            ReviewGuard AI is an educational NLP project that
+            analyzes review text and predicts whether it is
+            likely to be deceptive or truthful.
+
+            The application combines a Flask backend with
+            Natural Language Processing and a trained
+            machine-learning model.
+
+        </p>
+
+    </div>
+
+
+    <div class="technology">
+
+        <span>Python</span>
+
+        <span>Flask</span>
+
+        <span>NLP</span>
+
+        <span>Scikit-learn</span>
+
+        <span>Machine Learning</span>
+
+        <span>HTML</span>
+
+        <span>CSS</span>
+
+        <span>JavaScript</span>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+    <span>
+        🛡️ ReviewGuard AI
+    </span>
+
+    <span>
+        NLP + Machine Learning Project
+    </span>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+
+const reviewBox =
+    document.getElementById("review");
+
+
+const wordCount =
+    document.getElementById("wordCount");
+
+
+const charCount =
+    document.getElementById("charCount");
+
+
+
+function updateCounter() {
+
+    const text =
+        reviewBox.value.trim();
+
+
+    const words =
+        text === ""
+        ? 0
+        : text.split(/\s+/).length;
+
+
+    const characters =
+        reviewBox.value.length;
+
+
+    wordCount.textContent =
+        words + " words";
+
+
+    charCount.textContent =
+        characters + " characters";
+
+}
+
+
+
+reviewBox.addEventListener(
+    "input",
+    updateCounter
+);
+
+
+
+function clearReview() {
+
+    reviewBox.value = "";
+
+    updateCounter();
+
+    reviewBox.focus();
+
+}
+
+
+
+function useExample(type) {
+
+
+    if (type === "genuine") {
+
+        reviewBox.value =
+            "The room was clean and comfortable. " +
+            "The staff were friendly and check-in was quick. " +
+            "The location was convenient and the breakfast " +
+            "was good. I would stay here again.";
+
+    }
+
+
+    if (type === "suspicious") {
+
+        reviewBox.value =
+            "Absolutely amazing!!! Best hotel ever!!! " +
+            "Everything was perfect and incredible. " +
+            "You MUST book this hotel immediately!!! " +
+            "This is the greatest place in the world!!!";
+
+    }
+
+
+    updateCounter();
+
+    reviewBox.focus();
+
+}
+
+
+
+updateCounter();
+
+
+</script>
+
+
+</body>
+
+</html>
